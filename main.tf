@@ -1,4 +1,6 @@
 provider "awk" {
-set = "" 
+    region                  = ""
+    shared_credentials_file = ""
+    profile                 = ""
+    
 }
-
