@@ -7,9 +7,9 @@ variable "aws_region" {
 }
 
 variable "access_key " {
-    default=""
+    default="2"
 }
 
 variable "secret_key " {
-    default=""
+    default="1"
 }
