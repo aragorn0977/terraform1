@@ -3,15 +3,29 @@ provider "google" {
  project     = "${var.progetto}"
  region      = "${var.region}"
 }
+resource "google_compute_network" "default" {
+  name = "classroom-network"
+}
 
-
+resource "google_compute_firewall" "default" {
+  name    = "classroom-firewall"
+  network = "${google_compute_network.default.name}"
+  allow {
+    protocol = "icmp"
+  }
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+  source_tags = ["ssh"]
+}
 
 resource "google_compute_instance" "default" {
  count = "${var.n_studenti}"
  name         = "studente-${count.index}"
  machine_type = "${var.server_instance_type}"
  zone         = "${var.zone}"
- tags         = ["externalssh"]
+ tags         = ["ssh"]
 
  boot_disk {
    initialize_params {
@@ -19,19 +33,7 @@ resource "google_compute_instance" "default" {
      size = "${var.server_size_disk}"
    }
  }
- 
-resource "google_compute_firewall" "gh-9564-firewall-externalssh" {
-  name    = "gh-9564-firewall-externalssh"
-  network = "default"
 
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["externalssh"]
-}
 
  network_interface {
    network = "default"
@@ -40,11 +42,7 @@ resource "google_compute_firewall" "gh-9564-firewall-externalssh" {
      // Include this section to give the VM an external ip address
    }
  }
- #metadata_startup_script = "yum install -y ansible "
-
-
-
-
+depends_on = ["google_compute_firewall.default"] 
 } /* FINE INSTANZA */
 
 

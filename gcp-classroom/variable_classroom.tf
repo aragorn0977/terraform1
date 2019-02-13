@@ -4,7 +4,7 @@ variable "n_studenti" {
 
 
 variable "server_instance_type" {
-  default = "t2.micro"
+  default = "g1-small"
 }
 
 variable "server_image_os" {
