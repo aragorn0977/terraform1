@@ -1,9 +1,7 @@
-
-
 provider "google" {
  credentials = "${file("CREDENTIAL.json")}"
- project     = "terraform1-230315"
- region      = "europe-north1"
+ project     = "${var.progetto}"
+ region      = "${var.region}"
 }
 
 
@@ -12,26 +10,31 @@ resource "random_id" "instance_id" {
 }
 
 resource "google_compute_instance" "default" {
- name         = "openshift-worker-${random_id.instance_id.hex}"
- machine_type = "f1-micro"
- zone         = "europe-north1-a"
- count = 9
+ count = "${var.n_studenti}"
+ name         = "openshift-worker-${count.index}"
+ machine_type = "${var.server_instance_type}"
+ zone         = "${var.zone}"
+ tags         = ["externalssh"]
+
  boot_disk {
    initialize_params {
-     image = "centos-7"
+     image = "${var.server_image_os}"
+     size = "${var.server_size_disk}"
    }
  }
+ 
+resource "google_compute_firewall" "gh-9564-firewall-externalssh" {
+  name    = "gh-9564-firewall-externalssh"
+  network = "default"
 
-/*
-disk {
-  source      = "${google_compute_disk.foobar.name}"
-  auto_delete = false
-  boot        = false
-  size = "20"
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["externalssh"]
 }
-*/
-
-
 
  network_interface {
    network = "default"
@@ -41,4 +44,10 @@ disk {
    }
  }
  #metadata_startup_script = "yum install -y ansible "
-}
+
+
+
+
+} /* FINE INSTANZA */
+
+
