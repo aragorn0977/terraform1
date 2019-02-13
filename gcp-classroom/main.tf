@@ -1,17 +1,14 @@
 provider "google" {
- credentials = "${file("CREDENTIAL.json")}"
+ credentials = "${file("_CREDENTIAL.json")}"
  project     = "${var.progetto}"
  region      = "${var.region}"
 }
 
 
-resource "random_id" "instance_id" {
- byte_length = 8
-}
 
 resource "google_compute_instance" "default" {
  count = "${var.n_studenti}"
- name         = "openshift-worker-${count.index}"
+ name         = "studente-${count.index}"
  machine_type = "${var.server_instance_type}"
  zone         = "${var.zone}"
  tags         = ["externalssh"]
